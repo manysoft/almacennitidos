@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            max-width: 400px;
+            width: 100%;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card login-card p-4 bg-white">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-lock text-primary fa-3x mb-2"></i>
+                <h3 class="fw-bold">Acceso al Sistema</h3>
+                <p class="text-muted small">Introduce tus credenciales</p>
+            </div>
+            
+            <div id="error-alert" class="alert alert-danger d-none" role="alert"></div>
+
+            <form id="form-login" onsubmit="intentarLogin(event)">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Usuario</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" class="form-control" id="usuario" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="btn-ingresar">
+                    Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function intentarLogin(e) {
+            e.preventDefault();
+            var user = document.getElementById('usuario').value;
+            var pass = document.getElementById('password').value;
+            var btn = document.getElementById('btn-ingresar');
+            var alertBox = document.getElementById('error-alert');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verificando...';
+            alertBox.classList.add('d-none');
+
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    if (response.success) {
+                        // Si es exitoso, cargamos el Dashboard completo pasando los datos de sesión
+                        document.open();
+                        document.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head><title>Cargando Dashboard...</title></head>
+                            <body style="background:#f8f9fa;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+                                <div style="text-align:center;">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <p style="margin-top:10px;color:#666;">Bienvenido <b>${response.usuario}</b> (${response.rol}). Cargando sistema...</p>
+                                </div>
+                            </body>
+                            </html>
+                        `);
+                        // Reemplazamos la vista trayendo el HTML del Dashboard
+                        window.location.href = window.location.href; // Opcional o renderizar via template
+                    } else {
+                        alertBox.innerText = response.message;
+                        alertBox.classList.remove('d-none');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Ingresar';
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    alertBox.innerText = "Error de conexión: " + err.message;
+                    alertBox.classList.remove('d-none');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Ingresar';
+                })
+                .validarLogin(user, pass);
+        }
+    </script>
+</body>
+</html>
