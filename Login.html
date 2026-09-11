@@ -42,14 +42,14 @@
                         <label class="form-label fw-bold">Usuario</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" class="form-control" id="usuario" name="usuario" required>
+                            <input type="text" class="form-control" id="usuario" required>
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold">Contraseña</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="btn-ingresar">
@@ -67,7 +67,8 @@
         function enviarCredenciales(e) {
             e.preventDefault();
             
-            var formElement = document.getElementById('form-login');
+            var user = document.getElementById('usuario').value;
+            var pass = document.getElementById('password').value;
             var btn = document.getElementById('btn-ingresar');
             var alertBox = document.getElementById('error-alert');
 
@@ -75,11 +76,10 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verificando...';
             alertBox.classList.add('d-none');
 
-            // Enviamos el formulario completo serializado
+            // Llamada limpia enviando variables directas
             google.script.run
                 .withSuccessHandler(function(response) {
                     if (response.success) {
-                        // Cambiamos el diseño a pantalla de Dashboard al autenticarse
                         document.body.className = "bg-light";
                         document.getElementById('contenedor-principal').innerHTML = `
                             <div class="w-100 px-3">
@@ -110,7 +110,7 @@
                     btn.disabled = false;
                     btn.innerHTML = 'Ingresar';
                 })
-                .validarLogin(formElement);
+                .validarLogin(user, pass);
         }
     </script>
 </body>
