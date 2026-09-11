@@ -26,7 +26,7 @@
 </head>
 <body>
 
-    <div class="container d-flex justify-content-center" id="app-container">
+    <div class="container d-flex justify-content-center" id="contenedor-principal">
         <div class="card login-card p-4 bg-white">
             <div class="card-body">
                 <div class="text-center mb-4">
@@ -37,19 +37,19 @@
                 
                 <div id="error-alert" class="alert alert-danger d-none" role="alert"></div>
 
-                <form id="form-login" onsubmit="intentarLogin(event)">
+                <form id="form-login" onsubmit="enviarCredenciales(event)">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Usuario</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" class="form-control" id="usuario" required>
+                            <input type="text" class="form-control" id="usuario" name="usuario" required>
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold">Contraseña</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-                            <input type="password" class="form-control" id="password" required>
+                            <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="btn-ingresar">
@@ -64,10 +64,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function intentarLogin(e) {
+        function enviarCredenciales(e) {
             e.preventDefault();
-            var user = document.getElementById('usuario').value;
-            var pass = document.getElementById('password').value;
+            
+            var formElement = document.getElementById('form-login');
             var btn = document.getElementById('btn-ingresar');
             var alertBox = document.getElementById('error-alert');
 
@@ -75,16 +75,17 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verificando...';
             alertBox.classList.add('d-none');
 
+            // Enviamos el formulario completo serializado
             google.script.run
                 .withSuccessHandler(function(response) {
                     if (response.success) {
-                        // Cambiamos dinámicamente el contenido al Dashboard de manera segura
+                        // Cambiamos el diseño a pantalla de Dashboard al autenticarse
                         document.body.className = "bg-light";
-                        document.getElementById('app-container').innerHTML = `
-                            <div class="w-100">
+                        document.getElementById('contenedor-principal').innerHTML = `
+                            <div class="w-100 px-3">
                                 <nav class="navbar navbar-dark bg-dark px-4 rounded shadow-sm mb-4">
                                     <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-chart-line text-primary me-2"></i> Dashboard Principal</span>
-                                    <div class="text-white">
+                                    <div class="text-white d-flex align-items-center">
                                         <span class="badge bg-secondary me-2">ID: ${response.idUsuario}</span>
                                         <span class="me-3 fw-bold"><i class="fa-solid fa-user me-1"></i> ${response.usuario}</span>
                                         <button class="btn btn-outline-light btn-sm" onclick="location.reload()">Cerrar Sesión</button>
@@ -104,12 +105,12 @@
                     }
                 })
                 .withFailureHandler(function(err) {
-                    alertBox.innerText = "Error de conexión con el servidor: " + err.message;
+                    alertBox.innerText = "Error crítico de ejecución: " + err.message;
                     alertBox.classList.remove('d-none');
                     btn.disabled = false;
                     btn.innerHTML = 'Ingresar';
                 })
-                .validarLogin(user, pass);
+                .validarLogin(formElement);
         }
     </script>
 </body>
