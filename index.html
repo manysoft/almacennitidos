@@ -64,8 +64,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT (/exec)
-        const URL_API_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxW5Kik5PLOX-J1M9KxH_7e_6eOWdBEqFGwp_GzgQS_Fi_y03z-uIOZqotOfs95FElwtg/exec";
+        // PEGA AQUÍ TU URL NUEVA DE GOOGLE APPS SCRIPT (/exec)
+        const URL_API_APPS_SCRIPT = "AQUI_PEGA_TU_URL_DE_APPS_SCRIPT_EXEC";
 
         async function enviarCredenciales(e) {
             e.preventDefault();
@@ -80,12 +80,11 @@
             alertBox.classList.add('d-none');
 
             try {
-                // Petición HTTP POST hacia Google Sheets a través de Apps Script
                 const response = await fetch(URL_API_APPS_SCRIPT, {
                     method: 'POST',
-                    mode: 'cors', // Necesario para peticiones cruzadas desde GitHub Pages
+                    redirect: 'follow', // Vital para que Google Apps Script maneje las redirecciones de seguridad
                     headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', // Evita problemas de pre-flight CORS en GAS
+                        'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify({ usuario: user, password: pass })
                 });
@@ -93,7 +92,6 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Si el login es correcto, pintamos el Dashboard en pantalla
                     document.body.className = "bg-light";
                     document.getElementById('contenedor-principal').innerHTML = `
                         <div class="w-100 px-3">
